@@ -19,6 +19,9 @@ import "./ChainLinkPriceConsumer/MumbaiPriceConsumer.sol";
 
 contract RNC is IRNC, MumbaiVRFConsumer, MumbaiPriceConsumer, Ownable {
     
+    function version() public pure returns(string memory) {
+        return "1";
+    }
     
     mapping (bytes32 => Applicant) public applicants;
 

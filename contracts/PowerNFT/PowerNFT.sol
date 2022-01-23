@@ -42,7 +42,7 @@ contract PowerNFT is ERC721, ERC721URIStorage, ERC721Burnable, Ownable, DataStor
 
     constructor() ERC721("PowerNFT", "PWR") {
         commissionContAddr = address(0);   //should be changed after commissionContract deployed.
-        RNCAddr = address(0);  //should be changed after RNC deployed.
+        RNCAddr = 0xd674B940A128C81B9894b4a0Db2B2044acbc2882;  //RNC version 1 on mumbai.
         commissionContract = ICommissionContract(commissionContAddr);
         RNC = IRNC(RNCAddr);
     }

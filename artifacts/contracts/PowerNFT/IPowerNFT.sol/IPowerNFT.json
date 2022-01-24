@@ -62,9 +62,9 @@
           "type": "string"
         },
         {
-          "internalType": "string",
+          "internalType": "address",
           "name": "refferal",
-          "type": "string"
+          "type": "address"
         },
         {
           "internalType": "uint256",
@@ -94,11 +94,11 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_chance",
+          "name": "_chancePercent",
           "type": "uint256"
         }
       ],
-      "name": "setChance",
+      "name": "setChancePercent",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -106,17 +106,12 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "addr",
-          "type": "address"
-        },
-        {
           "internalType": "uint256",
-          "name": "value",
+          "name": "_commissionPercent",
           "type": "uint256"
         }
       ],
-      "name": "setCommission",
+      "name": "setCommissionPercent",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

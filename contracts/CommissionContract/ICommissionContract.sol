@@ -13,5 +13,5 @@ pragma solidity ^0.8.7;
 
 interface ICommissionContract {
 
-    function buyCard(string memory refferal, uint256 dappId) external payable;
+    function payCommission(address refferal, uint256 dappId) external payable;
 }

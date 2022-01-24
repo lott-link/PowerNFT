@@ -49,7 +49,7 @@ abstract contract DataStorage {
         counter++;
     }
     function _decrement() internal {
-
+        counter--;
     }
 
     uint256 randomness;
@@ -60,7 +60,6 @@ abstract contract DataStorage {
     uint256 selectedToken;
     function _selectToken(uint256 _tokenId) internal {
         selectedToken = _tokenId;
-        _setTokenBalance(_tokenId, power * tokenValue[_tokenId]);
     }
 
     uint256 deadLine;
@@ -73,6 +72,7 @@ abstract contract DataStorage {
     function _resetRNCWithhold() internal {
         delete RNCWithhold;
     }
+
     /**
      * @dev Deduct the `RNCWithhold` from incomming value and return rest of it.
      */
@@ -95,13 +95,11 @@ abstract contract DataStorage {
         freeTokenId = _freeTokenId;
     }
 
-    uint256 totalValueLocked;
+    uint256 totalValueLocked_;
     function _lockValue(uint256 _value) internal {
-        totalValueLocked += _value;
+        totalValueLocked_ += _value;
     }
-
-
-
+    
 
     mapping(uint256 => uint256) tokenValue;
     function _setTokenValue(uint256 _tokenId, uint256 _tokenValue) internal {

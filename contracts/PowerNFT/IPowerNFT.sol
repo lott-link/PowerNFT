@@ -27,13 +27,13 @@ interface IPowerNFT {
 
     function setRoundTime(uint256 _roundTime) external;
 
-    function setChance(uint256 _chance) external;
+    function setChancePercent(uint256 _chancePercent) external;
 
     function setPower(uint256 _power) external;
 
-    function setCommission(address addr, uint256 value) external;
+    function setCommissionPercent(uint256 _commissionPercent) external;
 
-    function buyCard(string memory uri, string memory refferal, uint256 dappId) external payable;
+    function buyCard(string memory uri, address refferal, uint256 dappId) external payable;
 
     function burnAndWithdraw(uint256 tokenId) external;
 }

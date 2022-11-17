@@ -16,8 +16,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./IPowerNFT.sol";
-import "../RNC/IRNC.sol";
-import "../CommissionContract/ICommissionContract.sol";
+import "../RNC/RNC.sol";
+import "../CommissionContract/ICommissionCont.sol";
 import "./DataStorage.sol";
 
 /**
@@ -31,24 +31,14 @@ import "./DataStorage.sol";
  * -peer advertisement system. commission will be shared between refferals.
  * owner of the contract will be changed to LOTT-DAO in the next updates. 
  */
-contract PowerNFT is IPowerNFT, ERC721, ERC721URIStorage, Ownable, DataStorage {
-
-    function version() public pure returns(string memory) {
-        return "1";
-    }
-
-    ICommissionContract commissionContract;
-    IRNC RNC;
+contract PowerNFT is IPowerNFT, ERC721, ERC721URIStorage, Ownable, DataStorage, RNC {
 
     event RollDice(bytes32 requestId);
     event Win(uint256 tokenId, uint256 amount);
 
 
     constructor() ERC721("PowerNFT", "PWR") {
-        commissionContAddr = 0x6aAd5a41f93Ff379624678f052f395C82294E53d;   //Commission Contract version 1 on mumbai
-        RNCAddr = 0xd674B940A128C81B9894b4a0Db2B2044acbc2882;  //RNC version 1 on mumbai.
-        commissionContract = ICommissionContract(commissionContAddr);
-        RNC = IRNC(RNCAddr);
+        commissionAddr = 0x6aAd5a41f93Ff379624678f052f395C82294E53d;   //Commission Contract version 1 on mumbai
 
         setVars(
             1 days, //roundTime
@@ -57,7 +47,6 @@ contract PowerNFT is IPowerNFT, ERC721, ERC721URIStorage, Ownable, DataStorage {
             25 //commissionPercent
         );
     }
-
 
     function totalValueLocked() public view returns(uint256) {
         return totalValueLocked_;
@@ -116,15 +105,11 @@ contract PowerNFT is IPowerNFT, ERC721, ERC721URIStorage, Ownable, DataStorage {
 
 
     function rollDice() public roundTimePassed{
-        bytes4 selector = this.select.selector;
-        bytes32 requestId = RNC.getRandomNumber{value:RNCWithhold}(selector);
+        bytes32 requestId = getRandomNumber();
         emit RollDice(requestId);
-        _resetRNCWithhold();
     }
 
-
-
-    function select(uint256 _randomness) public onlyRNC {
+    function _select(uint256 _randomness) internal override {
         _setRandomness(_randomness);
 
         if(_randomness % 100 <= chancePercent) {
@@ -159,22 +144,20 @@ contract PowerNFT is IPowerNFT, ERC721, ERC721URIStorage, Ownable, DataStorage {
         _;
     }
 
-    modifier onlyRNC() {
-        require(msg.sender == RNCAddr, "caller is not the valid RNC");
-        _;
-    }
-
     function _collectValue(uint256 _value, address _refferal, uint256 _dappId) internal {
-        uint256 available = _deductRNCWithhold(RNC.applicantFee(), _value);
+        uint256 rncFee = applicantFee();
+        _value = _value - rncFee;
+
+        swap_MATIC_LINK677(rncFee);
 
         uint256 commission = _value * commissionPercent / 100;
 
-        if(available > commission) {
-            available -= commission;
-            commissionContract.payCommission{value : commission}(_refferal, _dappId);
+        if(_value > commission) {
+            _value -= commission;
+            ICommissionCont(commissionAddr).payCommission{value : commission}(_refferal, _dappId);
         }
 
-        _lockValue(available); 
+        _lockValue(_value); 
     }
 
     function _mintToken(string memory _uri, uint256 _value) internal {

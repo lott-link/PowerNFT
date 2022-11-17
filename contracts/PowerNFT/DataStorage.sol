@@ -15,8 +15,10 @@ pragma solidity ^0.8.7;
 
 abstract contract DataStorage {
 
-    address RNCAddr;
-    address commissionContAddr;
+    address commissionAddr;
+    function _setcommissionCont(address comAddr) internal {
+        commissionAddr = comAddr;
+    }
 
 ///////// set by the owner ////////
 
@@ -65,29 +67,6 @@ abstract contract DataStorage {
     uint256 deadLine;
     function _setdeadLine(uint256 _deadLine) internal {
         deadLine = _deadLine;
-    }
-
-
-    uint256 RNCWithhold;     //withhold cash needed to activate RNC
-    function _resetRNCWithhold() internal {
-        delete RNCWithhold;
-    }
-
-    /**
-     * @dev Deduct the `RNCWithhold` from incomming value and return rest of it.
-     */
-    function _deductRNCWithhold(uint256 applicantFee, uint256 value) internal returns(uint256){
-        uint256 requiredAmount = applicantFee - RNCWithhold;
-        if(requiredAmount > 0){
-            if(requiredAmount >= value){
-                RNCWithhold += value;
-                value = 0;
-            }else{
-                RNCWithhold += requiredAmount;
-                value -= requiredAmount;
-            }
-        }
-        return value;
     }
 
     uint256 freeTokenId;

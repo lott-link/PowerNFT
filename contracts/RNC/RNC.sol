@@ -13,23 +13,13 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IRNC.sol";
-import "./ChainLinkVRFConsumer/MumbaiVRFConsumer.sol";
-import "./ChainLinkPriceConsumer/MumbaiPriceConsumer.sol";
+import "./utils/VRFConsumer.sol";
+import "./utils/PriceConsumer.sol";
+import "./utils/Swapper.sol";
 
-contract RNC is IRNC, MumbaiVRFConsumer, MumbaiPriceConsumer, Ownable {
-    
-    function version() public pure returns(string memory) {
-        return "1";
-    }
-    
-    mapping (bytes32 => Applicant) public applicants;
+contract RNC is VRFConsumer, PriceConsumer, Swapper, Ownable {
 
-    struct Applicant{
-        address contractAddress;
-        bytes4 callBackSelector;
-        uint256 randomResult;
-    }
+    mapping(bytes32 => uint256) randomResults;
 
     /**
      * @dev See {IRNC-applicantFee}.
@@ -42,12 +32,9 @@ contract RNC is IRNC, MumbaiVRFConsumer, MumbaiPriceConsumer, Ownable {
     /**
      * @dev See {IRNC-getRandomNumber}.
      */
-    function getRandomNumber(bytes4 _callBackSelector) public payable returns(bytes32 requestId){
+    function getRandomNumber() internal returns(bytes32 requestId){
         require(LINK.balanceOf(address(this)) >= linkFee, "Not enough LINK");
-        require(msg.value >= applicantFee() / 2, "Not enough MATIC");
         requestId = requestRandomness(keyHash, linkFee);
-        applicants[requestId] = Applicant(msg.sender, _callBackSelector, 0);
-        emit Request(requestId);
         return requestId;
     }
 
@@ -55,36 +42,25 @@ contract RNC is IRNC, MumbaiVRFConsumer, MumbaiPriceConsumer, Ownable {
      * @dev Callback function used by VRF Coordinator
      *
      * fulfill applicant last info (randomness)
-     * response to the applicant request
+     * select to the applicant request
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-        applicants[requestId].randomResult = randomness;
-        Applicant memory app = applicants[requestId];
-        _response(
-            app.contractAddress,
-            app.callBackSelector,
-            app.randomResult
-        );
+        randomResults[requestId] = randomness;
+        _select(randomness);
     }
 
     /**
-     * @dev Response function to the applicant contract.
+     * @dev select function to the applicant contract.
      *
      * Requirements:
      *
      * - call back should be successful.
      * 
-     * Emits a {Response} event.
+     * Emits a {select} event.
      */
-    function _response(address contractAddress, bytes4 selector, uint256 randomResult) private {
-        (bool success, bytes memory data) = contractAddress.call(abi.encodeWithSelector(selector, randomResult));
-        require(success, "Could Not Response Randomness");
-        emit Response(data);
-    }
+    function _select(uint256 randomResult) internal virtual{}
     
     
-    
-
     /**
      * @dev Returns LINK supply of the contract
      */

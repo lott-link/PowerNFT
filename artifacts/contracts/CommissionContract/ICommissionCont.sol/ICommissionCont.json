@@ -1,0 +1,29 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ICommissionCont",
+  "sourceName": "contracts/CommissionContract/ICommissionCont.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "refferal",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dappId",
+          "type": "uint256"
+        }
+      ],
+      "name": "payCommission",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

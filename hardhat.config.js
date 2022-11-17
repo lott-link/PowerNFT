@@ -1,24 +1,53 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
-require('@openzeppelin/hardhat-upgrades');
 
-const { PRIVATE_KEY, ALCHEMY_API_KEY, POLYGONSCAN_API_KEY} = require('./secret.json');
+const { PRIVATE_KEY, MUMBAI_API_KEY, ETHERSCAN_API_KEY, POLYGONSCAN_API_KEY } = require('../lott-io/secret.json');
 
 module.exports = {
-  solidity: "0.8.11",
+  
+  solidity: {
+  version: "0.8.17",
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    }
+   }
+  },
+
   networks: {
-    mainnet: {
-      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    polygon: {
+      url: `https://polygon-rpc.com/`,
       accounts: [`0x${PRIVATE_KEY}`],
     },
-    mumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    polygonMumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${MUMBAI_API_KEY}`,
       accounts: [`0x${PRIVATE_KEY}`],
     },
   },
   etherscan: {
-    // Your API key for Polygonscan
-    // Obtain one at https://polygonscan.com/ for polygon networks
-    apiKey: `${POLYGONSCAN_API_KEY}`
+    apiKey: {
+      mainnet: `${ETHERSCAN_API_KEY}`,
+      ropsten: `${ETHERSCAN_API_KEY}`,
+      rinkeby: `${ETHERSCAN_API_KEY}`,
+      goerli: `${ETHERSCAN_API_KEY}`,
+      kovan: `${ETHERSCAN_API_KEY}`,
+
+      // polygon
+      polygon: `${POLYGONSCAN_API_KEY}`,
+      polygonMumbai: `${POLYGONSCAN_API_KEY}`,
+
+      
+      // // avalanche
+      // avalanche: `${SNOWTRACE_API_KEY}`,
+      // avalancheFujiTestnet: `${SNOWTRACE_API_KEY}`,
+      
+      // xdai and sokol don't need an API key, but you still need
+      // to specify one; any string placeholder will work
+      xdai: "api-key",
+      sokol: "api-key",
+    }
   },
+
 };
